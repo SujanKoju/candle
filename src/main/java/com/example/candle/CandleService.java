@@ -15,9 +15,9 @@ public class CandleService {
 
     public CandleService() {
         Random rand = new Random();
-        for (int i = 0; i < 10; i++) // INSERTING 10 Dummy data
+        for (int i = 0; i < 50; i++) // INSERTING 10 Dummy data
         {
-            data.add(new CandleSeriesData(LocalDateTime.now().minusMinutes(30 * i), "USD", rand.nextFloat() * 100));
+            data.add(new CandleSeriesData(LocalDateTime.now().minusMinutes(15 * i), "USD", rand.nextFloat() * 100));
         }
 
     }
@@ -36,8 +36,8 @@ public class CandleService {
                     dataWithInCertainFrequency.add(candleData);
                 }
             }
-
-            candleDtos.add(prepareCandleDtoFromDataOfThatFrequency(dataWithInCertainFrequency));
+            CandleDto candleDto = prepareCandleDtoFromDataOfThatFrequency(dataWithInCertainFrequency);
+            candleDtos.add(candleDto);
             System.out.println(dataWithInCertainFrequency);
             time1 = time1.plusSeconds(granularity);
             time2 = time2.plusSeconds(granularity);
@@ -50,8 +50,15 @@ public class CandleService {
         dataWithInCertainFrequency.sort(Comparator.comparing(CandleSeriesData::getPrice));
         candleDto.setLow(dataWithInCertainFrequency.get(0).getPrice());
         candleDto.setHigh(dataWithInCertainFrequency.get(dataWithInCertainFrequency.size() - 1).getPrice());
-
-
+        dataWithInCertainFrequency.sort(Comparator.comparing(CandleSeriesData::getTime));
+        candleDto.setOpen(dataWithInCertainFrequency.get(0).getPrice());
+        candleDto.setClose(dataWithInCertainFrequency.get(dataWithInCertainFrequency.size() - 1).getPrice());
+        candleDto.setVolume(prepareVolume());
         return candleDto;
+    }
+
+    private double prepareVolume() {
+        Random rand = new Random();
+        return rand.nextFloat();
     }
 }
